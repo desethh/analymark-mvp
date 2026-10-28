@@ -1,3 +1,4 @@
+import {currentAccount,unauthorized} from '@/lib/auth';
 import {database} from '@/lib/storage';
 import {cities,normalizeKaspiUrl} from '@/lib/public-product';
 import {parsePublicPrices,type PublicPrices} from '@/lib/public-prices';
@@ -5,6 +6,7 @@ import {acquireKaspiSlot,readLimited} from '@/lib/kaspi-http';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export async function POST(request:Request){
+ if(!await currentAccount())return unauthorized();
  const origin=request.headers.get('origin');if(origin){try{if(new URL(origin).host!==request.headers.get('host'))return Response.json({error:'Недопустимый источник запроса'},{status:403});}catch{return Response.json({error:'Недопустимый источник запроса'},{status:403});}}
  let canonical:{url:string;productId:string},city:string,page:number;
  try{const raw=await request.text();if(raw.length>4096)throw new Error('Слишком длинный запрос');const body=JSON.parse(raw);if(typeof body.url!=='string'||body.url.length>2000||typeof body.city!=='string'||!Object.hasOwn(cities,body.city))throw new Error('Укажите товар и поддерживаемый город.');canonical=normalizeKaspiUrl(body.url);city=body.city;page=body.page??0;if(!Number.isInteger(page)||page<0||page>249)throw new Error('Недопустимый номер страницы.');}catch(e){return Response.json({error:e instanceof Error?e.message:'Проверьте запрос'},{status:400});}
