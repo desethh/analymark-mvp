@@ -8,11 +8,16 @@ const db=database();
 async function call(path:string,method='GET',body?:unknown,cookie='',origin=base){return fetch(base+path,{method,redirect:'manual',headers:{Origin:origin,'Content-Type':'application/json',Cookie:cookie},body:body===undefined?undefined:JSON.stringify(body)});}
 try{
  let r=await call('/workspace');assert.equal(r.status,307);assert.equal(r.headers.get('location'),'/login');
- for(const path of ['/api/calculations','/api/kaspi/product','/api/kaspi/prices'])assert.equal((await call(path,path==='/api/calculations'?'GET':'POST',path==='/api/calculations'?undefined:{})).status,401);
+ for(const path of ['/api/calculations','/api/kaspi/product','/api/kaspi/prices','/api/tools/ai'])assert.equal((await call(path,path==='/api/calculations'?'GET':'POST',path==='/api/calculations'?undefined:{})).status,401);
  assert.equal((await call('/api/auth/register','POST',{email:emails[0],password,name:'QA'},'','https://foreign.invalid')).status,403);
  const cookies:string[]=[];
  for(const email of emails){r=await call('/api/auth/register','POST',{email,password,name:'QA Test'});assert.equal(r.status,200,await r.text());const set=r.headers.get('set-cookie')!;assert.match(set,/HttpOnly/i);assert.match(set,/SameSite=lax/i);cookies.push(set.split(';')[0]);}
  assert.equal((await call('/api/auth/login','POST',{email:emails[0],password:'wrong'})).status,401);
+ for(const path of ['/workspace/tools','/workspace/tools/audit','/workspace/tools/seo','/workspace/tools/reviews']){r=await call(path);assert.equal(r.status,307);assert.ok(r.headers.get('location')?.startsWith('/login?next='));r=await call(path,'GET',undefined,cookies[0]);assert.equal(r.status,200);}
+ assert.equal((await call('/api/tools/ai','POST',{tool:'audit'},cookies[0],'https://foreign.invalid')).status,403);
+ assert.equal((await call('/api/tools/ai','POST',{tool:'bidder'},cookies[0])).status,400);
+ if(process.env.OPENAI_ENABLED!=='true'||!process.env.OPENAI_API_KEY)assert.equal((await call('/api/tools/ai','POST',{tool:'audit',title:'QA Item',description:'USB-C power adapter, 20 watts, cable is not included.'},cookies[0])).status,503);
+
  assert.equal((await call('/api/auth/register','POST',{email:emails[0],password,name:'QA'})).status,409);
  const payload={name:'QA isolated calculation',inputs:defaults,offers:[],product:null,url:'',city:'Алматы',demo:false,routes:[{name:'one',cost:0},{name:'two',cost:0},{name:'three',cost:0}]};
  r=await call('/api/calculations','POST',payload,cookies[0]);assert.equal(r.status,201,await r.clone().text());const {id}=await r.json();

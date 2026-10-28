@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
 import { type PublicProduct } from '@/lib/public-product';
 import { useMarketPrices } from '@/lib/use-market-prices';
@@ -6,16 +7,16 @@ import { marketRecommendation } from '@/lib/market-prices';
 import { MarketGuidance } from '@/components/market-guidance';
 import { KaspiPrices } from '@/components/kaspi-prices';
 import { MarketplaceLogo } from '@/components/marketplace-logo';
-import { ArrowUpRight, ArrowRight, Plus, Bookmark, ChartNoAxesCombined, SlidersHorizontal, BookOpen, ChevronRight, Check, X, Link as LinkIcon, Headphones, Download, Trash2, Menu, LayoutGrid, Search, Database } from 'lucide-react';
+import { ArrowUpRight, ArrowRight, Plus, Bookmark, ChartNoAxesCombined, SlidersHorizontal, BookOpen, ChevronRight, Check, X, Link as LinkIcon, Headphones, Download, Trash2, Menu, LayoutGrid, Search, Database, Wrench } from 'lucide-react';
 import { calculate, defaults, minimumPrice, sources, validateInputs, type Inputs, type Market } from '@/lib/economics';
 
 type Saved={id:string;name:string;created_at:string;payload:{name:string;inputs:Inputs;product?:PublicProduct|null;url:string;city:string;demo:boolean;routes?:{name:string;cost:number}[]}};
 const money=(n:number)=>new Intl.NumberFormat('ru-KZ',{maximumFractionDigits:0}).format(n)+'\u00a0₸';
 const analysisTabs = [{id:'market',label:'Рынок',icon:ChartNoAxesCombined},{id:'economics',label:'Экономика товара',icon:SlidersHorizontal},{id:'suppliers',label:'Закупка у поставщика',icon:LinkIcon}] as const;
 const number=(n:number)=>new Intl.NumberFormat('ru-KZ',{maximumFractionDigits:1}).format(n);
-export default function Workspace({accountName}:{accountName:string}){
+export default function Workspace({accountName,initialTab='market'}:{accountName:string;initialTab?:'market'|'economics'|'suppliers'}){
  const [sidebarSelection,setSidebarSelection]=useState('overview');
- const [analysisTab,setAnalysisTab]=useState<(typeof analysisTabs)[number]['id']>('market');
+ const [analysisTab,setAnalysisTab]=useState<(typeof analysisTabs)[number]['id']>(initialTab);
  function tabKey(e:React.KeyboardEvent<HTMLButtonElement>,index:number){
   const last=analysisTabs.length-1;
   const next=e.key==='ArrowRight'?(index+1)%analysisTabs.length:e.key==='ArrowLeft'?(index+last)%analysisTabs.length:e.key==='Home'?0:e.key==='End'?last:null;
@@ -92,7 +93,7 @@ export default function Workspace({accountName}:{accountName:string}){
     if(n.id==='saved')setView('saved');
     else if(n.id==='sources')setView('method');
     else {setView('analysis');setAnalysisTab(n.id==='analytics'?'economics':'market');if(n.id==='search')requestAnimationFrame(()=>document.querySelector<HTMLInputElement>('[aria-label="Ссылка на товар"]')?.focus());}
-   }}><n.icon aria-hidden="true" size={17} strokeWidth={1.6}/><span>{({overview:'Обзор',search:'Поиск',analytics:'Аналитика',saved:'Расчёты',sources:'Источники'} as const)[n.id]}</span>{n.id==='saved'&&<span className="nav-count">{saved.length}</span>}</button>;})}</nav>
+   }}><n.icon aria-hidden="true" size={17} strokeWidth={1.6}/><span>{({overview:'Обзор',search:'Поиск',analytics:'Аналитика',saved:'Расчёты',sources:'Источники'} as const)[n.id]}</span>{n.id==='saved'&&<span className="nav-count">{saved.length}</span>}</button>;})}<Link href="/workspace/tools" className="nav-item" title="Инструменты"><Wrench aria-hidden="true" size={17}/><span>Инструменты</span></Link></nav>
    <div className="marketplace-sidebar"><div className="workspace-label">МАРКЕТПЛЕЙСЫ</div><nav aria-label="Маркетплейсы">{([
     {id:'kaspi',label:'Kaspi.kz',mark:'K',className:'kaspi'},
     {id:'halyk',label:'Halyk Market',mark:'H',className:'halyk'},

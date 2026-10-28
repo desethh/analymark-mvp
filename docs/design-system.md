@@ -21,3 +21,7 @@ Public navigation has a wordmark, an explanation anchor and login/workspace CTA.
 ## Landing capabilities showcase
 
 Replaces the old “Что есть в MVP” list with four pill tabs and a single visible feature panel, following the supplied references. Graphite for market, lavender for economics, blue for procurement, and purple graphite for saved calculations. Product-interface illustrations are HTML/CSS with Lucide icons, and numerical examples are explicitly labelled as educational. Tabs support arrow keys, Home/End, visible focus, persistent panel IDs and responsive wrapping. CTA uses the server-provided register/workspace destination. No autoplay, gradients or shadows.
+
+## Seller tools
+
+Shared public/private catalog: task pill tabs, introduction tile, two tool cards with code-native Lucide illustrations and actual marketplace logos. Dark Bento palette retained from the user references; no gradients, 3D shadows or fake sales figures. Separate AI screens use labelled source fields and a result column, collapse on mobile. Connection-dependent tools have explicit unavailable status. AI generation is disabled until explicitly enabled with a server key. Working sources and integration status remain separate.

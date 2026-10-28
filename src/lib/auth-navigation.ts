@@ -1,0 +1,1 @@
+export function authDestination(value:unknown){return typeof value==='string'&&/^\/workspace(?:(?:\?step=(?:market|economics|suppliers))|(?:\/tools(?:\/(?:audit|seo|reviews))?))?$/.test(value)?value:'/workspace';}
