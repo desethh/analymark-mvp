@@ -17,3 +17,7 @@ Direction: the user's dark Material / Bento reference, combined with verified UI
 ## Public site and accounts
 
 Public navigation has a wordmark, an explanation anchor and login/workspace CTA. The homepage explains the three-step workflow and current scope without invented testimonials or promises of profit. Existing graphite/lime/lavender/blue tokens are retained instead of the generic generator’s unrelated palette. Account forms have visible labels, autocomplete, password visibility control, validation feedback and submit loading state. On mobile the form precedes the introductory content. Workspace has account name/logout and a compact heading, with no promotional opening pair.
+
+## Landing capabilities showcase
+
+Replaces the old “Что есть в MVP” list with four pill tabs and a single visible feature panel, following the supplied references. Graphite for market, lavender for economics, blue for procurement, and purple graphite for saved calculations. Product-interface illustrations are HTML/CSS with Lucide icons, and numerical examples are explicitly labelled as educational. Tabs support arrow keys, Home/End, visible focus, persistent panel IDs and responsive wrapping. CTA uses the server-provided register/workspace destination. No autoplay, gradients or shadows.
