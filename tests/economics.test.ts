@@ -1,0 +1,11 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { defaults, calculate, kaspiDelivery, minimumPrice, validateInputs, median } from '../src/lib/economics.ts';
+test('Kaspi threshold: a higher price can yield a lower profit',()=>{assert.equal(kaspiDelivery(9999,1,'country'),927);assert.equal(kaspiDelivery(10000,1,'country'),1507);assert.ok(calculate(defaults,9999).profit>calculate(defaults,10000).profit);});
+test('Weight boundaries and direction use distinct tariffs',()=>{assert.equal(kaspiDelivery(20000,5,'city'),1275);assert.equal(kaspiDelivery(20000,5.01,'city'),1565);assert.equal(kaspiDelivery(20000,5,'express'),1971);});
+test('The maximum purchase achieves the requested profit',()=>{const cap=calculate(defaults).maxPurchase;const actual=calculate({...defaults,purchase:cap});assert.ok(Math.abs(actual.profit-defaults.target)<.001);});
+test('Minimum price finds earliest feasible integer across shipping jumps',()=>{const x={...defaults,purchase:7000,inbound:0,advertising:0,packaging:0,tax:0,commission:0};assert.equal(minimumPrice(x,2000),9927);assert.ok(calculate(x,10000).profit<2000);});
+test('Minimum target is actually feasible and no lower price succeeds',()=>{const p=minimumPrice(defaults,defaults.target)!;assert.ok(calculate(defaults,p).profit>=defaults.target);for(let i=1;i<p;i++)assert.ok(calculate(defaults,i).profit<defaults.target);});
+test('Reject nonfinite, missing, negative, fractional quantities and invalid rates',()=>{for(const x of [{...defaults,quantity:0},{...defaults,quantity:1.5},{...defaults,price:NaN},{...defaults,commission:99,tax:4},{...defaults,weight:-1},{}])assert.throws(()=>validateInputs(x));});
+test('Ozon uses manual delivery, never the Kaspi schedule',()=>{assert.equal(calculate({...defaults,market:'ozon',manualDelivery:333}).delivery,333);});
+test('Median does not mutate inputs and supports empty sets',()=>{const x=[4,2,8,1];assert.equal(median(x),3);assert.deepEqual(x,[4,2,8,1]);assert.equal(median([]),null);});

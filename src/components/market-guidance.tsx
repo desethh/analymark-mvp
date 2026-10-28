@@ -1,0 +1,21 @@
+'use client';
+import {ArrowRight} from 'lucide-react';
+import type {Inputs} from '@/lib/economics';
+import {marketRecommendation,type MarketPriceBook,type PriceProgress} from '@/lib/market-prices';
+const money=(n:number)=>new Intl.NumberFormat('ru-KZ',{maximumFractionDigits:2}).format(n)+'\u00a0₸';
+
+export function MarketGuidance({book,loading,error,progress,inputs,invalid,onUsePrice,onRefresh,purchase=false}:{book:MarketPriceBook|null;loading:boolean;error:string;progress:PriceProgress|null;inputs:Inputs;invalid:string;onUsePrice:(price:number)=>void;onRefresh:()=>void;purchase?:boolean}){
+ const advice=!invalid?marketRecommendation(inputs,book):null;
+ return <section className="market-guidance" aria-label={purchase?'Рыночные ориентиры закупки':'Рыночные ориентиры цены'} aria-busy={loading}>
+  <div className="section-heading"><div><span className="section-kicker">ВСЕ ПРЕДЛОЖЕНИЯ ТОВАРА</span><h2>{purchase?'Закупка с учётом рынка':'Рыночные ориентиры цены'}</h2></div><button className="text-button" disabled={loading} onClick={onRefresh}>Обновить рынок</button></div>
+  {loading?<p className="hint" role="status">Собираем полный список предложений{progress?`: ${progress.received}${progress.total!==null?` из ${progress.total}`:''}`:'…'}. Рекомендация появится после завершения.</p>:!book?.statistics||!book.complete?<p className="hint" role={error||book?.issue?'alert':undefined}>{error||book?.issue||(book?.complete?'В выбранном городе нет предложений.':'Добавьте товар Kaspi во вкладке «Рынок», чтобы получить ориентиры.')} Рыночные рекомендации пока недоступны.</p>:<>
+   <p className="hint">{book.city} · {book.statistics.count} предложений · проверено {new Date(book.fetchedTo).toLocaleString('ru-KZ',{timeZone:'Asia/Qyzylorda'})}. Одинаковые цены учитываются отдельно для каждого предложения.</p>
+   {invalid?<p className="negative">Проверьте параметры расчёта: {invalid}</p>:advice&&<>
+    <div className="market-scenarios">{advice.scenarios.map(s=><article className="market-scenario" key={s.id}><span className="small">{s.label}</span><strong className="scenario-price">{money(s.price)}</strong>{!purchase&&<p className="scenario-metric"><span>Прибыль с единицы</span><strong className={s.profit<0?'negative':''}>{money(s.profit)}</strong></p>}<p className="scenario-metric"><span>Закупка не выше</span><strong className={s.purchaseCap<0?'negative':''}>{s.purchaseCap<0?'Цель недостижима':money(s.purchaseCap)}</strong></p><button className="text-button" onClick={()=>onUsePrice(s.price)} aria-label={`Применить цену — ${s.label.toLowerCase()}: ${money(s.price)}`}>Применить цену<ArrowRight aria-hidden="true" size={14}/></button></article>)}</div>
+    <div className="sale-recommendation"><div><span className="section-kicker">РЕКОМЕНДУЕМАЯ ЦЕНА ПРОДАЖИ</span><strong>{advice.price===null?'Цель недостижима':money(advice.price)}</strong><p>{advice.price===null?'При текущих расходах цель недостижима в пределах поддерживаемой цены до 1 млрд ₸.':advice.aboveMedian?`Для цели ${money(inputs.target)} нужна цена выше медианы ${money(book.statistics.median)}. Конкурентоспособность такой цены не подтверждена.`:'Медиана используется как рыночный ориентир; цена округляется вверх до целого тенге и проверяется на целевую прибыль.'}</p>{advice.purchaseCap!==null&&<p>При этой цене закупка для цели {money(inputs.target)} — не выше <b>{money(advice.purchaseCap)}</b> за единицу.</p>}</div>{advice.price!==null&&<button className="button secondary" onClick={()=>onUsePrice(advice.price!)}>Применить рекомендацию<ArrowRight aria-hidden="true" size={14}/></button>}</div>
+    <details className="guidance-method"><summary>Как получена рекомендация</summary><p className="hint">Рекомендация — минимальная целая цена не ниже медианы, которая покрывает указанные расходы и целевую прибыль с учётом тарифных порогов. Это ценовой сценарий, а не прогноз продаж. Предел закупки учитывает доставку партии, но не дополнительные расходы {purchase?'сценариев поставки ниже':'во вкладке «Закупка у поставщика»'}.</p></details>
+    <p className="hint">Текущий расчёт: цена продажи <b>{money(inputs.price)}</b>. Нажмите «Применить», чтобы использовать выбранный ориентир{purchase?' в сценариях поставки ниже':''}.</p>
+   </>}
+  </>}
+ </section>;
+}

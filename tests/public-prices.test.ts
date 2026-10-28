@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {parsePublicPrices} from '../src/lib/public-prices.ts';
+const context={productId:'149595086',url:'https://kaspi.kz/shop/p/test-149595086/',city:'Алматы',page:0,pageSize:5};
+const offer={masterSku:'149595086',price:4214,merchantId:'DO_NOT_KEEP_ID',merchantName:'DO_NOT_KEEP_NAME',merchantRating:5,telephone:'DO_NOT_KEEP_PHONE',deliveryOptions:{TO_DOOR:{deliveryDays:3,deliveryCost:499,deliveryThreshold:5000,locatedInPoint:'DO_NOT_KEEP_ADDRESS'},PICKUP:{deliveryDays:0}}};
+test('Prices expose only anonymous amounts and numeric delivery terms',()=>{const p=parsePublicPrices({total:1,offers:[offer]},context);assert.equal(p.prices[0].price,4214);assert.deepEqual(p.prices[0].delivery,[{type:'TO_DOOR',days:3,cost:499,threshold:5000},{type:'PICKUP',days:0,cost:null,threshold:null}]);assert.ok(!JSON.stringify(p).includes('DO_NOT_KEEP'));assert.equal(p.complete,true);assert.equal(p.hasNext,false);});
+test('Pagination counts and positions follow the upstream response',()=>{const p=parsePublicPrices({total:9,offers:Array(5).fill(offer)},context);assert.equal(p.hasNext,true);assert.equal(p.complete,false);const p2=parsePublicPrices({total:9,offers:Array(4).fill(offer)},{...context,page:1});assert.equal(p2.prices[0].position,6);assert.equal(p2.hasNext,false);assert.equal(p2.complete,false);});
+test('Equal prices are retained as separate anonymous offers',()=>{assert.equal(parsePublicPrices({total:2,offers:[offer,offer]},context).prices.length,2);});
+test('No full-market claims for invalid or incomplete data',()=>{const p=parsePublicPrices({total:2,offers:[offer,{...offer,price:0}]},context);assert.equal(p.prices.length,1);assert.equal(p.complete,false);assert.equal(parsePublicPrices({offers:[offer]},context).total,null);});
+test('Reject wrong product and missing offer arrays',()=>{assert.throws(()=>parsePublicPrices({total:1,offers:[{...offer,masterSku:'other'}]},context));assert.throws(()=>parsePublicPrices({},context));});
