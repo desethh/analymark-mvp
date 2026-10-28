@@ -3,7 +3,7 @@ import {promisify} from 'node:util';
 import type {DatabaseSync} from 'node:sqlite';
 const scrypt=promisify(derive);
 export const sessionAge=7*24*60*60;
-export type Account={id:string;name:string;email:string};
+export type Account={id:string;name:string;email:string;emailVerified:boolean};
 export function tokenHash(value:string){return createHash('sha256').update(value).digest('hex');}
 export async function hashPassword(password:string){const salt=randomBytes(16).toString('hex');const key=await scrypt(password,salt,64) as Buffer;return salt+':'+key.toString('hex');}
 export async function checkPassword(password:string,encoded:string){const [salt,hex]=encoded.split(':');const expected=Buffer.from(hex,'hex');const key=await scrypt(password,salt,64) as Buffer;return expected.length===key.length&&timingSafeEqual(expected,key);}
@@ -22,7 +22,7 @@ export function newSession(db:DatabaseSync,userId:string,now=Date.now()){
 }
 export function sessionAccount(db:DatabaseSync,token:string|undefined,now=Date.now()):Account|null{
  if(!token||!/^[a-f0-9]{64}$/.test(token))return null;
- const row=db.prepare('SELECT u.id,u.name,u.email FROM users u JOIN sessions s ON s.user_id=u.id WHERE s.token_hash=? AND s.expires_at>?').get(tokenHash(token),now);return row?{id:String(row.id),name:String(row.name),email:String(row.email)}:null;
+ const row=db.prepare('SELECT u.id,u.name,u.email,u.email_verified_at FROM users u JOIN sessions s ON s.user_id=u.id WHERE s.token_hash=? AND s.expires_at>?').get(tokenHash(token),now);return row?{id:String(row.id),name:String(row.name),email:String(row.email),emailVerified:row.email_verified_at!==null}:null;
 }
 export function allowAttempt(db:DatabaseSync,key:string,now=Date.now(),limit=10){
  db.prepare('DELETE FROM auth_attempts WHERE expires_at<=?').run(now);

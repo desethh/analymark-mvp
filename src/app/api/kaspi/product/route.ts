@@ -1,3 +1,4 @@
+import {logEvent} from '@/lib/observability';
 import {currentAccount,unauthorized} from '@/lib/auth';
 import {database} from '@/lib/storage';
 import {cities,normalizeKaspiUrl,type PublicProduct} from '@/lib/public-product';
@@ -24,6 +25,6 @@ export async function POST(request:Request){
   const html=await readLimited(response);const product=parseKaspiProduct(html,canonical.url,city);
   db.prepare('INSERT OR REPLACE INTO public_products VALUES (?,?,?)').run(key,JSON.stringify(product),Date.now());
   return Response.json({product,cached:false});
- }catch(e){const error=e instanceof Error?e.message:'Не удалось загрузить товар';return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Попробуйте позднее.':error==='fetch failed'?'Нет соединения с Kaspi. Проверьте доступ сервера к сети.':error},{status:502});}
+ }catch(e){logEvent('kaspi.product.failed',502);const error=e instanceof Error?e.message:'Не удалось загрузить товар';return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Попробуйте позднее.':error==='fetch failed'?'Нет соединения с Kaspi. Проверьте доступ сервера к сети.':error},{status:502});}
  finally{clearTimeout(timeout);}
 }

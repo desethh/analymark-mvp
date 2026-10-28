@@ -1,3 +1,7 @@
+import {issueAccountToken,verificationRequired} from '@/lib/account-tokens';
+import {sendAccountMail,mailReady} from '@/lib/mail';
+import {logEvent} from '@/lib/observability';
+import {readJson} from '@/lib/request-json';
 import {cookies} from 'next/headers';
 import {database} from '@/lib/storage';
 import {allowAttempt,checkPassword,credentials,hashPassword,newSession,randomUUID,sessionAge,tokenHash} from '@/lib/auth-core';
@@ -12,21 +16,23 @@ export async function POST(request:Request,{params}:{params:Promise<{mode:string
  try{
   // Global budget also applies when the deployment has no trusted client-IP header.
   if(!allowAttempt(db,'global',Date.now(),100))return Response.json({error:'Слишком много попыток. Повторите через 15 минут.'},{status:429,headers:{'Retry-After':'900'}});
-  const raw=await request.text();if(raw.length>4096)throw new Error('Слишком длинный запрос.');
-  const {email,password,name}=credentials(JSON.parse(raw),mode==='register');
+  const body=await readJson(request);const {email,password,name}=credentials(body,mode==='register');
   if(!allowAttempt(db,'email:'+tokenHash(email)))return Response.json({error:'Слишком много попыток для этого email. Повторите через 15 минут.'},{status:429,headers:{'Retry-After':'900'}});
-  let user=db.prepare('SELECT id,password_hash FROM users WHERE email=?').get(email);
+  let user=db.prepare('SELECT id,password_hash,email_verified_at FROM users WHERE email=?').get(email);
   if(mode==='register'){
+   if(verificationRequired()&&!mailReady())return Response.json({error:'Почтовый сервис не настроен. Регистрация пока недоступна.'},{status:503});
+   if(body.acceptPrivacy!==true)return Response.json({error:'Подтвердите ознакомление с обработкой данных.'},{status:400});
    if(user)return Response.json({error:'Не удалось создать аккаунт. Попробуйте другой email или войдите.'},{status:409});
    const passwordHash=await hashPassword(password),id=randomUUID();
-   try{db.prepare('INSERT INTO users VALUES (?,?,?,?,?)').run(id,email,name,passwordHash,Date.now());}catch{return Response.json({error:'Не удалось создать аккаунт. Попробуйте другой email или войдите.'},{status:409});}
-   user={id,password_hash:passwordHash};
+   try{db.prepare('INSERT INTO users (id,email,name,password_hash,created_at,privacy_accepted_at) VALUES (?,?,?,?,?,?)').run(id,email,name,passwordHash,Date.now(),Date.now());}catch{return Response.json({error:'Не удалось создать аккаунт. Попробуйте другой email или войдите.'},{status:409});}
+   user={id,password_hash:passwordHash,email_verified_at:null};
   }else{
    const encoded=user?String(user.password_hash):'00000000000000000000000000000000:'+ '00'.repeat(64);
    const valid=await checkPassword(password,encoded);
    if(!user||!valid)return Response.json({error:'Неверный email или пароль.'},{status:401});
   }
+  let emailNotice='';if(verificationRequired()&&user.email_verified_at===null){try{const mailToken=issueAccountToken(db,String(user.id),'verify');await sendAccountMail(email,mailToken,'verify');}catch{logEvent('mail.verify.failed',503);emailNotice='Не удалось отправить письмо. Попробуйте отправить его повторно на странице подтверждения.';}}
   const token=newSession(db,String(user.id));jar.set(sessionCookie,token,{...options,maxAge:sessionAge});
-  return Response.json({ok:true},{headers:{'Cache-Control':'no-store'}});
+  return Response.json({ok:true,...(verificationRequired()&&user.email_verified_at===null?{next:'/verify-email',notice:emailNotice}: {})},{headers:{'Cache-Control':'no-store'}});
  }catch(e){return Response.json({error:e instanceof SyntaxError?'Проверьте данные формы.':e instanceof Error?e.message:'Не удалось войти.'},{status:400});}
 }

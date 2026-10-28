@@ -1,0 +1,5 @@
+import {database} from '../src/lib/storage.ts';
+import {readdir,stat,unlink} from 'node:fs/promises';
+import {join} from 'node:path';
+const db=database(),now=Date.now();try{for(const table of ['sessions','account_tokens','auth_attempts'])db.prepare('DELETE FROM '+table+' WHERE expires_at<=?').run(now);for(const [table,age] of [['public_products',15*60000],['public_price_pages',5*60000]] as const){if(db.prepare('SELECT name FROM sqlite_master WHERE name=?').get(table))db.prepare('DELETE FROM '+table+' WHERE fetched_at<?').run(now-age);}
+ const data=process.env.DATA_DIR||join(process.cwd(),'data');for(const [folder,pattern,age] of [['mail-outbox',/^[a-f0-9-]+\.json$/,86400000],['backups',/^analymark-[0-9TZ-]+\.sqlite$/,7*86400000]] as const){const dir=join(data,folder);for(const name of await readdir(dir).catch(()=>[])){if(!pattern.test(name))continue;const path=join(dir,name);if((await stat(path)).mtimeMs<now-age)await unlink(path);}}console.log('Expired sessions, tokens, caches and aged local files pruned.');}finally{db.close();}

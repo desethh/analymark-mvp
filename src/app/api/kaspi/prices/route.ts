@@ -1,3 +1,4 @@
+import {logEvent} from '@/lib/observability';
 import {currentAccount,unauthorized} from '@/lib/auth';
 import {database} from '@/lib/storage';
 import {cities,normalizeKaspiUrl} from '@/lib/public-product';
@@ -22,5 +23,5 @@ export async function POST(request:Request){
   const snapshot=parsePublicPrices(JSON.parse(await readLimited(response)),{...canonical,city,page,pageSize:20});
   db.prepare('INSERT OR REPLACE INTO public_price_pages VALUES (?,?,?)').run(key,JSON.stringify(snapshot),Date.now());
   return Response.json({snapshot,cached:false});
- }catch(e){return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Повторите позднее.':e instanceof Error&&e.message!=='fetch failed'?e.message:'Нет соединения с Kaspi.'},{status:502});}finally{clearTimeout(timer);}
+ }catch(e){logEvent('kaspi.prices.failed',502);return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Повторите позднее.':e instanceof Error&&e.message!=='fetch failed'?e.message:'Нет соединения с Kaspi.'},{status:502});}finally{clearTimeout(timer);}
 }

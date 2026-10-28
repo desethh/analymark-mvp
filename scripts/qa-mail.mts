@@ -1,0 +1,7 @@
+import {readdir,readFile,unlink} from 'node:fs/promises';
+import {join} from 'node:path';
+const dir=join(process.env.DATA_DIR||join(process.cwd(),'data'),'mail-outbox');
+async function findQaMail(email:string,subjectPart:string){if(!/^qa-[a-z0-9-]+@example\.invalid$/.test(email))throw Error('Only generated QA mail can be read');const files=await readdir(dir).catch(()=>[]);const matches=[];for(const name of files){if(!name.endsWith('.json'))continue;const value=JSON.parse(await readFile(join(dir,name),'utf8'));if(value.to===email&&String(value.subject).includes(subjectPart))matches.push({name,value});}matches.sort((a,b)=>String(b.value.createdAt).localeCompare(String(a.value.createdAt)));if(!matches.length)throw Error('No local QA mail found');const match=String(matches[0].value.text).match(/https?:\/\/[^\s]+/);if(!match)throw Error('No mail URL');return new URL(match[0]);}
+export async function removeQaMail(email:string){if(!/^qa-[a-z0-9-]+@example\.invalid$/.test(email))throw Error('Only QA mail can be removed');for(const name of await readdir(dir).catch(()=>[])){if(!name.endsWith('.json'))continue;const path=join(dir,name);const value=JSON.parse(await readFile(path,'utf8'));if(value.to===email)await unlink(path);}}
+
+export async function qaMail(email:string,subjectPart:string){for(let attempt=0;attempt<30;attempt++){try{return await findQaMail(email,subjectPart);}catch(e){if(attempt===29)throw e;await new Promise(r=>setTimeout(r,100));}}throw Error('QA mail not received');}

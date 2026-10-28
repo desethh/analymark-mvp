@@ -1,3 +1,4 @@
+import {logEvent} from '@/lib/observability';
 import {isAiConfigured} from '@/lib/ai-config';
 import {currentAccount,sameOrigin,unauthorized} from '@/lib/auth';
 import {database} from '@/lib/storage';
@@ -17,5 +18,5 @@ export async function POST(request:Request){
   const db=database();if(!allowAttempt(db,'ai-user:'+user.id,Date.now(),20)||!allowAttempt(db,'ai-global',Date.now(),100))throw new AiError('Лимит запросов ИИ достигнут. Повторите через 15 минут.',429);
   const result=await generateAi(input,{key,model:process.env.OPENAI_MODEL?.trim()||'gpt-4.1-mini'});
   return Response.json({result},{headers:{'Cache-Control':'no-store'}});
- }catch(e){return Response.json({error:e instanceof AiError?e.message:'Не удалось выполнить запрос.'},{status:e instanceof AiError?e.status:500,headers:{'Cache-Control':'no-store',...(e instanceof AiError&&e.status===429?{'Retry-After':'900'}:{})}});}
+ }catch(e){logEvent('ai.request.failed',e instanceof AiError?e.status:500);return Response.json({error:e instanceof AiError?e.message:'Не удалось выполнить запрос.'},{status:e instanceof AiError?e.status:500,headers:{'Cache-Control':'no-store',...(e instanceof AiError&&e.status===429?{'Retry-After':'900'}:{})}});}
 }
