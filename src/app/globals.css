@@ -83,3 +83,55 @@ a.button{text-decoration:none}.public-shell{max-width:1440px;margin:auto}.public
 .guide-card .guide-welcome-note{display:flex;align-items:flex-start;gap:10px;font-size:13px;margin:24px 0}
 .guide-welcome-note svg{flex-shrink:0;margin-top:2px;color:var(--lime)}
 @media(max-width:639px){.guide-card{padding:18px 20px 12px;border-radius:22px}.guide-welcome{padding:22px}.guide-welcome h2{font-size:30px}.guide-card h2{margin-top:16px}.guide-card>p:not(.guide-counter){font-size:14px;margin-bottom:16px}.guide-actions{margin-top:16px}.guide-actions .button{font-size:12px;padding-inline:13px}.guide-card .guide-welcome-note{font-size:12px}.guide-welcome-icon{margin:18px 0}}
+
+/* Batch acquisition first, then sales profitability. */
+.batch-economics{display:flex;flex-direction:column;gap:44px}
+.batch-section-heading{display:flex;gap:16px;align-items:flex-start;margin:8px 0 22px}
+.batch-step{display:grid;place-items:center;flex-shrink:0;width:40px;height:40px;border:1px solid var(--line);border-radius:14px;color:var(--lime);font-size:13px}
+.batch-section-heading h2{font-size:28px;margin:0 0 6px}
+.batch-section-heading p{color:var(--muted);font-size:14px;margin:0}
+.batch-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start}
+.batch-form{min-width:0;padding:28px;background:var(--surface);border-radius:24px}
+.batch-form>.hint:first-child{margin-bottom:24px}
+.batch-option{margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+.batch-option>.field,.batch-option>.fields-grid{margin-top:18px}
+.batch-option>.checkbox-field{color:var(--ink);font-size:14px;min-height:44px;align-items:center;margin-top:0}
+.batch-option>.hint{margin:8px 0 0}
+.batch-form h3{font-size:17px;font-weight:500;margin:0}
+.batch-extras-heading{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;margin-top:30px}
+.batch-expenses{display:flex;flex-direction:column;gap:18px}
+.batch-expense{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(100px,1fr) 44px;gap:10px;align-items:end}
+.batch-expense>.icon-button{margin-bottom:2px}
+.batch-expense .field>input{font-size:14px;font-weight:400}
+.batch-suggestions,.batch-sale-options{margin-top:24px;border-top:1px solid var(--line);font-size:13px}
+.batch-suggestions summary,.batch-sale-options summary{min-height:48px;padding:16px 0;cursor:pointer;color:var(--lime)}
+.batch-suggestions>div{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+.batch-suggestions .text-button{font-size:12px;text-align:left}
+.batch-suggestions>a{display:inline-block;line-height:1.7}
+.batch-summary,.batch-profit{min-width:0;padding:30px;border-radius:24px;background:var(--lime);color:var(--on-accent)}
+.batch-profit{background:var(--surface-purple);color:var(--ink)}
+.batch-summary .result-label,.batch-profit .result-label{color:inherit}
+.batch-total{display:block;font-size:clamp(32px,3.5vw,46px);font-weight:500;line-height:1.15;letter-spacing:-1.3px;margin:18px 0 12px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.batch-formula{font-size:12px;line-height:1.7;margin:8px 0;overflow-wrap:anywhere;opacity:.85}
+.batch-breakdown{padding-top:16px;margin:22px 0;border-top:1px solid currentColor}
+.batch-breakdown>div{display:flex;justify-content:space-between;gap:18px;padding:7px 0;font-size:13px;align-items:baseline}
+.batch-breakdown dt{overflow-wrap:anywhere;min-width:0}
+.batch-breakdown dd{margin:0;flex-shrink:0;font-variant-numeric:tabular-nums}
+.batch-unit{padding-top:18px;margin-top:18px;border-top:1px solid #91a96a}
+.batch-unit span{display:block;font-size:13px}
+.batch-unit strong{display:block;font-size:29px;font-weight:500;margin-top:6px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.batch-unit p,.batch-summary-note{font-size:12px;line-height:1.7;margin:8px 0 0}
+.batch-summary-note{margin-top:20px}
+.batch-tax-note{font-size:12px;line-height:1.8;color:var(--muted);padding-top:18px;margin:22px 0;border-top:1px solid var(--line)}
+.batch-sale-options>.fields-grid{margin:12px 0 18px}
+.batch-profit-total{padding-top:20px;margin:24px 0;border-top:1px solid var(--line)}
+.batch-profit-total>span{display:block;font-size:14px}
+.batch-profit-total>strong{display:block;font-size:36px;font-weight:500;line-height:1.2;color:var(--lime);margin-top:10px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.batch-profit .result-bottom{margin-bottom:18px;border-color:var(--line)}
+.batch-profit .result-bottom>span{color:var(--muted)}
+.batch-profit .result-bottom strong{color:var(--ink);overflow-wrap:anywhere}
+.batch-profit>.hint{margin:18px 0 0}
+.batch-error{color:var(--negative-ink);font-size:15px;margin:24px 0 0}
+@media(max-width:1023px){.batch-layout{grid-template-columns:1fr 1fr;gap:16px}.batch-form,.batch-summary,.batch-profit{padding:24px}.batch-expense{grid-template-columns:minmax(0,1fr) 44px}.batch-expense>.field:first-child{grid-column:1/-1}.batch-expense>.icon-button{grid-column:2}}
+@media(max-width:850px){.batch-layout{grid-template-columns:1fr}.batch-summary,.batch-profit{padding:28px}.batch-total{font-size:42px}.batch-expense{grid-template-columns:minmax(0,1.3fr) minmax(100px,1fr) 44px}.batch-expense>.field:first-child{grid-column:auto}.batch-expense>.icon-button{grid-column:auto}}
+@media(max-width:479px){.batch-economics{gap:32px}.batch-section-heading{gap:12px}.batch-section-heading h2{font-size:24px}.batch-step{width:34px;height:34px;border-radius:11px}.batch-form,.batch-summary,.batch-profit{padding:22px 20px}.batch-form>.fields-grid{column-gap:14px}.batch-form .field>span:first-child{font-size:12px;line-height:1.5}.batch-option>.fields-grid{grid-template-columns:1fr}.batch-expense{grid-template-columns:minmax(0,1fr) 44px}.batch-expense>.field:first-child{grid-column:1/-1}.batch-expense>.icon-button{grid-column:2}.batch-total{font-size:36px}.batch-profit-total>strong{font-size:30px}.batch-breakdown>div{gap:12px}.batch-breakdown dd{font-size:12px}}
