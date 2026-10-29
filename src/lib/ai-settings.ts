@@ -12,7 +12,7 @@ export function ollamaOrigin(value:string){
 
 export function readAiConfiguration(env:Record<string,string|undefined>=process.env):AiConfiguration|null{
  if(env.AI_ENABLED==='false')return null;
- const provider=env.AI_PROVIDER?.trim()||'ollama';
+ const provider=env.AI_PROVIDER?.trim()||'openai';
  if(provider==='openai'){
   if(env.OPENAI_ENABLED!=='true'||!env.OPENAI_API_KEY?.trim())return null;
   return {provider,model:env.OPENAI_MODEL?.trim()||'gpt-4.1-mini',key:env.OPENAI_API_KEY.trim()};

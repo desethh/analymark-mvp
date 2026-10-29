@@ -40,10 +40,10 @@ Kaspi — публичный недокументированный источн
 
 Документация: [Node SQLite backup](https://nodejs.org/api/sqlite.html), [Next self-hosting](https://nextjs.org/docs/app/guides/self-hosting), [Resend send email](https://resend.com/docs/api-reference/emails/send-email), [Caddy automatic HTTPS](https://caddyserver.com/docs/automatic-https).
 
-## Локальный ИИ в feature/ollama-qwen35
+## Провайдер ИИ
 
-Провайдер по умолчанию — Ollama, модель `qwen3.5:9b`. Нужны установленная модель и запущенный локальный сервер Ollama; новые веса без необходимости не скачиваются. Настройки подключения находятся в `.env.local` и `.env.example`; API-ключ не требуется. `AI_ENABLED=false` отключает генерацию. Старый OpenAI-ключ не используется при `AI_PROVIDER=ollama`.
+Провайдер по умолчанию — OpenAI API, модель `gpt-4.1-mini`. Настройки подключения находятся в `.env.local` и `.env.example`: `AI_PROVIDER=openai`, `AI_ENABLED=true`, `OPENAI_ENABLED=true` и собственный `OPENAI_API_KEY`. Без ключа генерация недоступна; `AI_ENABLED=false` отключает её явно. Шаблоны Docker также используют OpenAI. Значение ключа нельзя помещать в Git, клиентский код или журналы.
 
-Данные формы передаются только выбранному провайдеру. Для этой ветки проверяется локальный HTTP-адрес, облачные имена моделей не принимаются, редиректы запрещены. Запускайте Ollama с `OLLAMA_NO_CLOUD=1`, чтобы также запретить облачные функции самого Ollama. Приложение не включает доступ к Ollama из локальной сети автоматически.
+Данные формы передаются только выбранному провайдеру после запуска генерации. OpenAI вызывается сервером через Responses API с `store:false` и строгой JSON Schema; клиент получает проверенный результат. Сбой или отсутствие ключа не переключает приложение на Ollama. [Официальная документация OpenAI](https://developers.openai.com/api/docs/guides/migrate-to-responses).
 
-В Docker `127.0.0.1` обозначает сам контейнер. Шаблон использует `host.docker.internal:11434`; доступность модели на хосте нужно проверить отдельно. Эта конфигурация не разворачивает Ollama в контейнере, не скачивает веса и не подтверждает доступность GPU. Нативный локальный запуск проверяется отдельно командой `node --env-file=.env.local --experimental-strip-types scripts/check-ollama.mts`. Не открывайте незащищённый порт Ollama в интернет.
+Ollama можно выбрать отдельно через `AI_PROVIDER=ollama`. В Docker адрес `127.0.0.1` обозначает сам контейнер, поэтому для модели на хосте оставлена настройка `host.docker.internal:11434`. Она используется только при явном выборе Ollama. Проверка: `node --env-file=.env.local --experimental-strip-types scripts/check-ollama.mts`. При OpenAI установленная Ollama и её веса не требуются.
