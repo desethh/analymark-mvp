@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {database} from '../src/lib/storage.ts';
 import {defaults} from '../src/lib/economics.ts';
+import {readAiConfiguration} from '../src/lib/ai-settings.ts';
 import {tokenHash} from '../src/lib/auth-core.ts';
 const base='http://127.0.0.1:3000',tag=randomUUID(),emails=[`qa-a-${tag}@example.invalid`,`qa-b-${tag}@example.invalid`],password=randomUUID();
 const db=database();
@@ -25,7 +26,7 @@ try{
  for(const path of ['/workspace/tools','/workspace/tools/audit','/workspace/tools/seo','/workspace/tools/reviews']){r=await call(path);assert.equal(r.status,307);assert.ok(r.headers.get('location')?.startsWith('/login?next='));r=await call(path,'GET',undefined,cookies[0]);assert.equal(r.status,200);}
  assert.equal((await call('/api/tools/ai','POST',{tool:'audit'},cookies[0],'https://foreign.invalid')).status,403);
  assert.equal((await call('/api/tools/ai','POST',{tool:'bidder'},cookies[0])).status,400);
- if(process.env.OPENAI_ENABLED!=='true'||!process.env.OPENAI_API_KEY)assert.equal((await call('/api/tools/ai','POST',{tool:'audit',title:'QA Item',description:'USB-C power adapter, 20 watts, cable is not included.'},cookies[0])).status,503);
+ if(!readAiConfiguration())assert.equal((await call('/api/tools/ai','POST',{tool:'audit',title:'QA Item',description:'USB-C power adapter, 20 watts, cable is not included.'},cookies[0])).status,503);
 
  assert.equal((await call('/api/auth/register','POST',{email:emails[0],password,name:'QA',acceptPrivacy:true})).status,409);
  const payload={name:'QA isolated calculation',inputs:defaults,offers:[],product:null,url:'',city:'Алматы',demo:false,routes:[{name:'one',cost:0},{name:'two',cost:0},{name:'three',cost:0}]};
