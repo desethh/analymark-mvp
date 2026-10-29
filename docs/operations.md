@@ -22,7 +22,7 @@
 Одна копия приложения на Node 24 + постоянный volume SQLite + Caddy для HTTPS. Горизонтальное масштабирование этой конфигурацией не предусмотрено. Образы не опубликованы, внешний сервер не создавался.
 
 1. Подготовить сервер с Docker Engine и домен с DNS на сервер; открыть 80/443.
-2. Скопировать `deploy/compose.env.example` в защищённый файл вне Git, задать DOMAIN, ACME_EMAIL, MAIL_FROM и RESEND_API_KEY. Подтвердить домен отправителя в Resend. Указать собственный OpenAI-ключ и OPENAI_ENABLED=true только если нужен ИИ.
+2. Скопировать `deploy/compose.env.example` в защищённый файл вне Git, задать DOMAIN, ACME_EMAIL, MAIL_FROM и RESEND_API_KEY. Подтвердить домен отправителя в Resend. Для локального ИИ обеспечить доступ контейнера к Ollama с моделью `qwen3:14b`; собственный OpenAI-ключ нужен только при явном выборе провайдера `openai`.
 3. Проверить: `docker compose --env-file <секретный-env-файл> config --quiet`.
 4. Запустить: `docker compose --env-file <секретный-env-файл> up -d --build`.
 5. Проверить `/api/health`, регистрацию и доставку писем с внешнего браузера. Caddy получает сертификат только при подходящем домене и доступных DNS/портах.
@@ -42,8 +42,8 @@ Kaspi — публичный недокументированный источн
 
 ## Провайдер ИИ
 
-Провайдер по умолчанию — OpenAI API, модель `gpt-4.1-mini`. Настройки подключения находятся в `.env.local` и `.env.example`: `AI_PROVIDER=openai`, `AI_ENABLED=true`, `OPENAI_ENABLED=true` и собственный `OPENAI_API_KEY`. Без ключа генерация недоступна; `AI_ENABLED=false` отключает её явно. Шаблоны Docker также используют OpenAI. Значение ключа нельзя помещать в Git, клиентский код или журналы.
+Провайдер по умолчанию — локальная Ollama, модель `qwen3:14b`. Настройки подключения находятся в `.env.local` и `.env.example`: `AI_PROVIDER=ollama`, `AI_ENABLED=true`, `OLLAMA_MODEL=qwen3:14b`, `OLLAMA_BASE_URL=http://127.0.0.1:11434`, `OPENAI_ENABLED=false`. Модель должна быть установлена, а сервер Ollama — запущен. `AI_ENABLED=false` отключает генерацию. Шаблоны Docker также выбирают Ollama. Существующий ключ OpenAI сохраняется в локальной конфигурации, но не используется.
 
-Данные формы передаются только выбранному провайдеру после запуска генерации. OpenAI вызывается сервером через Responses API с `store:false` и строгой JSON Schema; клиент получает проверенный результат. Сбой или отсутствие ключа не переключает приложение на Ollama. [Официальная документация OpenAI](https://developers.openai.com/api/docs/guides/migrate-to-responses).
+Данные формы передаются только выбранному провайдеру после запуска генерации. Ollama вызывается через `/api/chat` с `think:false` и JSON Schema; клиент получает проверенный результат. Сбой Ollama не переключает приложение на OpenAI. [Модель Qwen3 14B](https://ollama.com/library/qwen3:14b), [документация Ollama](https://docs.ollama.com/capabilities/structured-outputs).
 
-Ollama можно выбрать отдельно через `AI_PROVIDER=ollama`. В Docker адрес `127.0.0.1` обозначает сам контейнер, поэтому для модели на хосте оставлена настройка `host.docker.internal:11434`. Она используется только при явном выборе Ollama. Проверка: `node --env-file=.env.local --experimental-strip-types scripts/check-ollama.mts`. При OpenAI установленная Ollama и её веса не требуются.
+В Docker адрес `127.0.0.1` обозначает сам контейнер, поэтому для модели на хосте используется `host.docker.internal:11434`; доступность сервера нужно проверить отдельно. Проверка: `node --env-file=.env.local --experimental-strip-types scripts/check-ollama.mts`. OpenAI можно выбрать отдельно через `AI_PROVIDER=openai`, `OPENAI_ENABLED=true` и собственный серверный ключ; автоматического переключения нет.

@@ -5,22 +5,22 @@ import {AiError,validateAiInput,resultSchema} from '../src/lib/ai-core.ts';
 import {generateAi} from '../src/lib/ai-service.ts';
 
 const input=validateAiInput({tool:'seo',title:'USB-C адаптер',description:'Мощность 20 Вт. В комплект входит адаптер без кабеля.'});
-const config={provider:'ollama' as const,model:'qwen3.5:9b',baseUrl:'http://127.0.0.1:11434',timeoutMs:180000};
+const config={provider:'ollama' as const,model:'qwen3:14b',baseUrl:'http://127.0.0.1:11434',timeoutMs:180000};
 const result={summary:'Черновик на основе указанных фактов.',items:[],draft:'USB-C адаптер 20 Вт. Кабель не входит в комплект.',warnings:[]};
 const success=()=>Response.json({done:true,done_reason:'stop',message:{role:'assistant',content:JSON.stringify(result),thinking:'never show this'}});
 
-test('OpenAI is the default but requires a key and opt-in; Ollama requires explicit selection',()=>{
- assert.equal(readAiConfiguration({}),null);
+test('Qwen3 14B is local by default; OpenAI requires explicit selection, key and opt-in',()=>{
+ assert.deepEqual(readAiConfiguration({}),config);
  assert.deepEqual(readAiConfiguration({AI_PROVIDER:'ollama'}),config);
  assert.equal(readAiConfiguration({AI_ENABLED:'false'}),null);
  assert.equal(readAiConfiguration({AI_PROVIDER:'openai',OPENAI_API_KEY:'secret'}),null);
- assert.equal(readAiConfiguration({OPENAI_ENABLED:'true'}),null);
- assert.deepEqual(readAiConfiguration({OPENAI_ENABLED:'true',OPENAI_API_KEY:'test-only'}),{provider:'openai',key:'test-only',model:'gpt-4.1-mini'});
+ assert.equal(readAiConfiguration({AI_PROVIDER:'openai',OPENAI_ENABLED:'true'}),null);
+ assert.deepEqual(readAiConfiguration({OPENAI_ENABLED:'true',OPENAI_API_KEY:'test-only'}),config);
  assert.equal(readAiConfiguration({AI_ENABLED:'false',OPENAI_ENABLED:'true',OPENAI_API_KEY:'test-only'}),null);
  assert.equal(readAiConfiguration({AI_PROVIDER:'openai',OPENAI_ENABLED:'true',OPENAI_API_KEY:'test-only'})?.provider,'openai');
  assert.throws(()=>readAiConfiguration({AI_PROVIDER:'unknown'}),AiError);
  assert.throws(()=>readAiConfiguration({AI_PROVIDER:'ollama',OLLAMA_MODEL:'qwen:cloud'}),AiError);
- assert.throws(()=>readAiConfiguration({AI_PROVIDER:'ollama',OLLAMA_MODEL:'qwen3.5:9b-cloud'}),AiError);
+ assert.throws(()=>readAiConfiguration({AI_PROVIDER:'ollama',OLLAMA_MODEL:'qwen3:14b-cloud'}),AiError);
  assert.throws(()=>readAiConfiguration({AI_PROVIDER:'ollama',OLLAMA_TIMEOUT_MS:'0'}),AiError);
 });
 
@@ -35,7 +35,7 @@ test('Ollama uses the exact model and schema locally, with thinking disabled and
  const mock:typeof fetch=async(url,options)=>{
   calls++;assert.equal(url,'http://127.0.0.1:11434/api/chat');assert.equal(options?.redirect,'error');
   assert.equal(new Headers(options?.headers).has('Authorization'),false);
-  const body=JSON.parse(String(options?.body));assert.equal(body.model,'qwen3.5:9b');assert.equal(body.stream,false);assert.equal(body.think,false);assert.deepEqual(body.format,resultSchema);assert.equal(body.options.num_ctx,16384);
+  const body=JSON.parse(String(options?.body));assert.equal(body.model,'qwen3:14b');assert.equal(body.stream,false);assert.equal(body.think,false);assert.deepEqual(body.format,resultSchema);assert.equal(body.options.num_ctx,16384);
   const source=JSON.parse(body.messages[1].content);assert.equal(source.tool,'seo');assert.equal(Object.hasOwn(source,'review'),false);assert.equal(Object.hasOwn(source,'tone'),false);assert.ok(body.messages[0].content.includes('недоверенный'));
   return success();
  };
