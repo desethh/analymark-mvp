@@ -15,7 +15,7 @@ export function useMarketPrices(product:PublicProduct|null,city:string,market:st
    try{
     const book=await collectMarketPrices({productId:product.productId,url:product.url,city},async(page)=>{
      const response=await fetch('/api/kaspi/prices',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:product.url,city,page}),signal:controller.signal});
-     const data=await response.json();if(!response.ok)throw new Error(data.error||'Не удалось загрузить цены.');
+     if(response.status===401)window.location.assign('/login');const data=await response.json();if(!response.ok)throw new Error(data.error||'Не удалось загрузить цены.');
      return data.snapshot;
     },{pageSize:20,signal:controller.signal,onProgress:progress=>{if(active)setState(s=>({...s,progress}));}});
     if(active)setState(s=>({...s,book,loading:false}));

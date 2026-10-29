@@ -1,0 +1,66 @@
+services:
+  app:
+    image: analymark-local
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_ORIGIN: https://${DOMAIN:?Set DOMAIN in deployment env}
+      MAIL_DELIVERY: resend
+      MAIL_FROM: ${MAIL_FROM:-}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      REQUIRE_EMAIL_VERIFICATION: "false"
+      OPENAI_ENABLED: ${OPENAI_ENABLED:-false}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+    volumes:
+      - app_data:/app/data
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+  backup:
+    image: analymark-local
+    build: .
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /app/data
+    volumes:
+      - app_data:/app/data
+    command: ["sh", "-c", "while true; do node --experimental-strip-types scripts/backup.mts && node --experimental-strip-types scripts/maintenance.mts; sleep 86400; done"]
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+volumes:
+  app_data:
+  caddy_data:
+  caddy_config:

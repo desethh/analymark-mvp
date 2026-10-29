@@ -4,11 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1",
+    "dev": "node --use-system-ca node_modules/next/dist/bin/next dev --hostname 127.0.0.1",
     "build": "next build",
-    "start": "next start --hostname 127.0.0.1",
+    "start": "node --use-system-ca node_modules/next/dist/bin/next start --hostname 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test tests/*.test.ts"
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "backup": "node --experimental-strip-types scripts/backup.mts",
+    "check:restore": "node --experimental-strip-types scripts/check-restore.mts",
+    "maintenance": "node --experimental-strip-types scripts/maintenance.mts",
+    "check:production": "node --experimental-strip-types scripts/check-production.mts"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

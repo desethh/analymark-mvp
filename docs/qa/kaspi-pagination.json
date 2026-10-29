@@ -1,0 +1,41 @@
+{
+  "checkedAt": "2026-10-28T22:29:34.733Z",
+  "scope": "One known product, QA upstream page size 2; production uses 20. Raw amounts checked against parsed values.",
+  "limitations": "Sequential source snapshot; not atomic. API prices checked against independent arithmetic, not confirmed checkout totals or seller-account data.",
+  "failures": 0,
+  "cases": [
+    {
+      "label": "Зарядное устройство · QA пагинации по 2 строки",
+      "url": "https://kaspi.kz/shop/p/apple-a2121-lightning-20-vt-belyi-149595086/",
+      "city": "Алматы",
+      "started": "2026-10-28T22:28:44.587Z",
+      "finished": "2026-10-28T22:29:34.732Z",
+      "productId": "149595086",
+      "name": "Зарядное устройство Apple A2121 Lightning 20 Вт белый",
+      "attributeCount": 12,
+      "pages": 5,
+      "total": 9,
+      "received": 9,
+      "complete": true,
+      "statistics": {
+        "count": 9,
+        "minimum": 4214,
+        "median": 7696,
+        "maximum": 34000
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        4214,
+        4221,
+        4222,
+        7167,
+        7696,
+        14999,
+        15000,
+        16800,
+        34000
+      ]
+    }
+  ]
+}

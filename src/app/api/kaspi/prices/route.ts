@@ -1,3 +1,5 @@
+import {logEvent} from '@/lib/observability';
+import {currentAccount,unauthorized} from '@/lib/auth';
 import {database} from '@/lib/storage';
 import {cities,normalizeKaspiUrl} from '@/lib/public-product';
 import {parsePublicPrices,type PublicPrices} from '@/lib/public-prices';
@@ -5,6 +7,7 @@ import {acquireKaspiSlot,readLimited} from '@/lib/kaspi-http';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export async function POST(request:Request){
+ if(!await currentAccount())return unauthorized();
  const origin=request.headers.get('origin');if(origin){try{if(new URL(origin).host!==request.headers.get('host'))return Response.json({error:'Недопустимый источник запроса'},{status:403});}catch{return Response.json({error:'Недопустимый источник запроса'},{status:403});}}
  let canonical:{url:string;productId:string},city:string,page:number;
  try{const raw=await request.text();if(raw.length>4096)throw new Error('Слишком длинный запрос');const body=JSON.parse(raw);if(typeof body.url!=='string'||body.url.length>2000||typeof body.city!=='string'||!Object.hasOwn(cities,body.city))throw new Error('Укажите товар и поддерживаемый город.');canonical=normalizeKaspiUrl(body.url);city=body.city;page=body.page??0;if(!Number.isInteger(page)||page<0||page>249)throw new Error('Недопустимый номер страницы.');}catch(e){return Response.json({error:e instanceof Error?e.message:'Проверьте запрос'},{status:400});}
@@ -20,5 +23,5 @@ export async function POST(request:Request){
   const snapshot=parsePublicPrices(JSON.parse(await readLimited(response)),{...canonical,city,page,pageSize:20});
   db.prepare('INSERT OR REPLACE INTO public_price_pages VALUES (?,?,?)').run(key,JSON.stringify(snapshot),Date.now());
   return Response.json({snapshot,cached:false});
- }catch(e){return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Повторите позднее.':e instanceof Error&&e.message!=='fetch failed'?e.message:'Нет соединения с Kaspi.'},{status:502});}finally{clearTimeout(timer);}
+ }catch(e){logEvent('kaspi.prices.failed',502);return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Повторите позднее.':e instanceof Error&&e.message!=='fetch failed'?e.message:'Нет соединения с Kaspi.'},{status:502});}finally{clearTimeout(timer);}
 }

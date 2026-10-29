@@ -1,0 +1,3 @@
+export async function readJson(request:Request,maxBytes=4096):Promise<Record<string,unknown>>{
+ const reader=request.body?.getReader();if(!reader)throw new Error('Нет данных запроса.');let size=0;const chunks:Uint8Array[]=[];while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>maxBytes){await reader.cancel();throw new Error('Слишком большой запрос.');}chunks.push(value);}let value;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw new Error('Некорректный JSON.');}if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('Некорректные данные запроса.');return value;
+}
