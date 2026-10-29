@@ -1,0 +1,65 @@
+{
+  "checkedAt": "2026-10-28T22:25:42.885Z",
+  "scope": "2 extra products, Алматы, max 6 pages",
+  "limitations": "Sequential source snapshot; not atomic. API prices checked against independent arithmetic, not confirmed checkout totals or seller-account data.",
+  "failures": 0,
+  "cases": [
+    {
+      "label": "iPhone 15 Dual SIM",
+      "url": "https://kaspi.kz/shop/p/apple-iphone-15-128-gb-dual-sim-chernyi-113933011/",
+      "city": "Алматы",
+      "started": "2026-10-28T22:25:12.739Z",
+      "finished": "2026-10-28T22:25:22.923Z",
+      "productId": "113933011",
+      "name": "Смартфон Apple iPhone 15 128 Gb Dual Sim черный",
+      "attributeCount": 41,
+      "pages": 1,
+      "total": 5,
+      "received": 5,
+      "complete": true,
+      "statistics": {
+        "count": 5,
+        "minimum": 416899,
+        "median": 423800,
+        "maximum": 544600
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        416899,
+        416900,
+        423800,
+        450500,
+        544600
+      ]
+    },
+    {
+      "label": "Чехол iPhone",
+      "url": "https://kaspi.kz/shop/p/dlja-apple-iphone-15-chernyi-130640327/",
+      "city": "Алматы",
+      "started": "2026-10-28T22:25:22.923Z",
+      "finished": "2026-10-28T22:25:42.884Z",
+      "productId": "130640327",
+      "name": "Для Apple iPhone 15 черный",
+      "attributeCount": 6,
+      "pages": 1,
+      "total": 4,
+      "received": 4,
+      "complete": true,
+      "statistics": {
+        "count": 4,
+        "minimum": 951,
+        "median": 952,
+        "maximum": 1100
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        951,
+        952,
+        952,
+        1100
+      ]
+    }
+  ]
+}

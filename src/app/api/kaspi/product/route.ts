@@ -1,3 +1,5 @@
+import {logEvent} from '@/lib/observability';
+import {currentAccount,unauthorized} from '@/lib/auth';
 import {database} from '@/lib/storage';
 import {cities,normalizeKaspiUrl,type PublicProduct} from '@/lib/public-product';
 import {parseKaspiProduct} from '@/lib/kaspi-parser';
@@ -6,6 +8,7 @@ export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const cacheMs=15*60*1000;
 export async function POST(request:Request){
+ if(!await currentAccount())return unauthorized();
  const origin=request.headers.get('origin');if(origin){try{if(new URL(origin).host!==request.headers.get('host'))return Response.json({error:'Недопустимый источник запроса'},{status:403});}catch{return Response.json({error:'Недопустимый источник запроса'},{status:403});}}
  let canonical:{url:string;productId:string},city:string;
  try{const raw=await request.text();if(raw.length>4096)throw new Error('Слишком длинный запрос');const body=JSON.parse(raw);if(typeof body.url!=='string'||body.url.length>2000||typeof body.city!=='string'||!Object.hasOwn(cities,body.city))throw new Error('Укажите ссылку и поддерживаемый город.');canonical=normalizeKaspiUrl(body.url);city=body.city;}catch(e){return Response.json({error:e instanceof Error?e.message:'Проверьте ссылку'},{status:400});}
@@ -22,6 +25,6 @@ export async function POST(request:Request){
   const html=await readLimited(response);const product=parseKaspiProduct(html,canonical.url,city);
   db.prepare('INSERT OR REPLACE INTO public_products VALUES (?,?,?)').run(key,JSON.stringify(product),Date.now());
   return Response.json({product,cached:false});
- }catch(e){const error=e instanceof Error?e.message:'Не удалось загрузить товар';return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Попробуйте позднее.':error==='fetch failed'?'Нет соединения с Kaspi. Проверьте доступ сервера к сети.':error},{status:502});}
+ }catch(e){logEvent('kaspi.product.failed',502);const error=e instanceof Error?e.message:'Не удалось загрузить товар';return Response.json({error:controller.signal.aborted?'Kaspi не ответил за 20 секунд. Попробуйте позднее.':error==='fetch failed'?'Нет соединения с Kaspi. Проверьте доступ сервера к сети.':error},{status:502});}
  finally{clearTimeout(timeout);}
 }

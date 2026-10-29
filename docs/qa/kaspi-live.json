@@ -1,0 +1,181 @@
+{
+  "checkedAt": "2026-10-28T22:24:13.806Z",
+  "scope": "6 cases, 3 categories, 2 cities; max 6 pages per case; only public product data and anonymous prices",
+  "limitations": "Sequential source snapshot; not atomic. API prices checked against independent arithmetic, not confirmed checkout totals or seller-account data.",
+  "failures": 0,
+  "cases": [
+    {
+      "label": "Зарядное устройство",
+      "url": "https://kaspi.kz/shop/p/apple-a2121-lightning-20-vt-belyi-149595086/",
+      "city": "Алматы",
+      "started": "2026-10-28T22:22:23.682Z",
+      "finished": "2026-10-28T22:22:33.855Z",
+      "productId": "149595086",
+      "name": "Зарядное устройство Apple A2121 Lightning 20 Вт белый",
+      "attributeCount": 12,
+      "pages": 1,
+      "total": 9,
+      "received": 9,
+      "complete": true,
+      "statistics": {
+        "count": 9,
+        "minimum": 4214,
+        "median": 7696,
+        "maximum": 34000
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        4214,
+        4221,
+        4222,
+        7167,
+        7696,
+        14999,
+        15000,
+        16800,
+        34000
+      ]
+    },
+    {
+      "label": "Зарядное устройство",
+      "url": "https://kaspi.kz/shop/p/apple-a2121-lightning-20-vt-belyi-149595086/",
+      "city": "Астана",
+      "started": "2026-10-28T22:22:33.855Z",
+      "finished": "2026-10-28T22:22:53.825Z",
+      "productId": "149595086",
+      "name": "Зарядное устройство Apple A2121 Lightning 20 Вт белый",
+      "attributeCount": 12,
+      "pages": 1,
+      "total": 8,
+      "received": 8,
+      "complete": true,
+      "statistics": {
+        "count": 8,
+        "minimum": 4214,
+        "median": 8798,
+        "maximum": 16800
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        4214,
+        4221,
+        4222,
+        7696,
+        9900,
+        14999,
+        15000,
+        16800
+      ]
+    },
+    {
+      "label": "Смартфон",
+      "url": "https://kaspi.kz/shop/p/samsung-galaxy-a16-4-gb-128-gb-serebristyi-131014726/",
+      "city": "Алматы",
+      "started": "2026-10-28T22:22:53.826Z",
+      "finished": "2026-10-28T22:23:13.833Z",
+      "productId": "131014726",
+      "name": "Смартфон Samsung Galaxy A16 4 ГБ/128 ГБ серебристый",
+      "attributeCount": 38,
+      "pages": 1,
+      "total": 4,
+      "received": 4,
+      "complete": true,
+      "statistics": {
+        "count": 4,
+        "minimum": 134111,
+        "median": 134111.5,
+        "maximum": 139999
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        134111,
+        134111,
+        134112,
+        139999
+      ]
+    },
+    {
+      "label": "Смартфон",
+      "url": "https://kaspi.kz/shop/p/samsung-galaxy-a16-4-gb-128-gb-serebristyi-131014726/",
+      "city": "Астана",
+      "started": "2026-10-28T22:23:13.833Z",
+      "finished": "2026-10-28T22:23:33.914Z",
+      "productId": "131014726",
+      "name": "Смартфон Samsung Galaxy A16 4 ГБ/128 ГБ серебристый",
+      "attributeCount": 38,
+      "pages": 1,
+      "total": 4,
+      "received": 4,
+      "complete": true,
+      "statistics": {
+        "count": 4,
+        "minimum": 134111,
+        "median": 134111.5,
+        "maximum": 139999
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        134111,
+        134111,
+        134112,
+        139999
+      ]
+    },
+    {
+      "label": "Книга",
+      "url": "https://kaspi.kz/shop/p/dzheims-k-atomnye-privychki-166128998/",
+      "city": "Алматы",
+      "started": "2026-10-28T22:23:33.914Z",
+      "finished": "2026-10-28T22:23:53.831Z",
+      "productId": "166128998",
+      "name": "Книга Джеймс К.: Атомные привычки",
+      "attributeCount": 10,
+      "pages": 1,
+      "total": 2,
+      "received": 2,
+      "complete": true,
+      "statistics": {
+        "count": 2,
+        "minimum": 9350,
+        "median": 9575,
+        "maximum": 9800
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        9350,
+        9800
+      ]
+    },
+    {
+      "label": "Книга",
+      "url": "https://kaspi.kz/shop/p/dzheims-k-atomnye-privychki-166128998/",
+      "city": "Астана",
+      "started": "2026-10-28T22:23:53.831Z",
+      "finished": "2026-10-28T22:24:13.805Z",
+      "productId": "166128998",
+      "name": "Книга Джеймс К.: Атомные привычки",
+      "attributeCount": 10,
+      "pages": 1,
+      "total": 2,
+      "received": 2,
+      "complete": true,
+      "statistics": {
+        "count": 2,
+        "minimum": 9350,
+        "median": 9575,
+        "maximum": 9800
+      },
+      "independentStatisticsMatch": true,
+      "issue": null,
+      "amounts": [
+        9350,
+        9800
+      ]
+    }
+  ]
+}
