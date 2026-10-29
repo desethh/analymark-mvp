@@ -11,7 +11,7 @@ export function KaspiPrices({product,city,onUsePrice,book,loading,error,progress
  const visible=rows.slice(displayPage*pageSize,(displayPage+1)*pageSize),stats=book?.statistics;
  const link=product.url+'?c='+cities[city];
  return <section className="seller-prices" aria-label="Цены предложений продавцов" aria-busy={loading}>
-  <div className="section-heading"><div><span className="section-kicker">ТОТ ЖЕ ТОВАР · {city.toUpperCase()}</span><h2>Цены предложений продавцов</h2></div><button className="text-button" onClick={onRefresh} disabled={loading}><RefreshCw aria-hidden="true" size={14}/>{loading?'Загружаем…':'Проверить цены'}</button></div>
+  <div className="section-heading" data-guide="prices"><div><span className="section-kicker">ТОТ ЖЕ ТОВАР · {city.toUpperCase()}</span><h2>Цены предложений продавцов</h2></div><button className="text-button" onClick={onRefresh} disabled={loading}><RefreshCw aria-hidden="true" size={14}/>{loading?'Загружаем…':'Проверить цены'}</button></div>
   <p className="hint">Только цены и условия доставки. Магазины не идентифицируются; ссылка ведёт на общую карточку товара. Кэш до 5 минут.</p>
   {loading&&<div className="prices-loading" role="status"><span className="loading-indicator" aria-hidden="true"/>Загружаем все предложения{progress?`: ${progress.received}${progress.total!==null?` из ${progress.total}`:''} · страниц: ${progress.pages}`:'…'}. Статистика появится после полной загрузки.</div>}
   {error&&<div className="prices-error" role="alert"><span>{error}</span><button className="text-button" onClick={onRefresh}>Повторить</button></div>}

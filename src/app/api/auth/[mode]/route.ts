@@ -24,7 +24,7 @@ export async function POST(request:Request,{params}:{params:Promise<{mode:string
    if(body.acceptPrivacy!==true)return Response.json({error:'Подтвердите ознакомление с обработкой данных.'},{status:400});
    if(user)return Response.json({error:'Не удалось создать аккаунт. Попробуйте другой email или войдите.'},{status:409});
    const passwordHash=await hashPassword(password),id=randomUUID();
-   try{db.prepare('INSERT INTO users (id,email,name,password_hash,created_at,privacy_accepted_at) VALUES (?,?,?,?,?,?)').run(id,email,name,passwordHash,Date.now(),Date.now());}catch{return Response.json({error:'Не удалось создать аккаунт. Попробуйте другой email или войдите.'},{status:409});}
+   try{db.prepare('INSERT INTO users (id,email,name,password_hash,created_at,privacy_accepted_at,onboarding_pending) VALUES (?,?,?,?,?,?,1)').run(id,email,name,passwordHash,Date.now(),Date.now());}catch{return Response.json({error:'Не удалось создать аккаунт. Попробуйте другой email или войдите.'},{status:409});}
    user={id,password_hash:passwordHash,email_verified_at:null};
   }else{
    const encoded=user?String(user.password_hash):'00000000000000000000000000000000:'+ '00'.repeat(64);

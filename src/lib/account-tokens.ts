@@ -12,4 +12,5 @@ export function completeAccountToken(db:DatabaseSync,token:unknown,purpose:Token
  else{if(!passwordHash)throw new Error('Missing password hash');db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(passwordHash,row.user_id);db.prepare('DELETE FROM sessions WHERE user_id=?').run(row.user_id);db.prepare('DELETE FROM account_tokens WHERE user_id=?').run(row.user_id);}
  db.exec('COMMIT');return true;}catch(e){db.exec('ROLLBACK');throw e;}
 }
-export function verificationRequired(){return process.env.NODE_ENV==='production'||process.env.REQUIRE_EMAIL_VERIFICATION!=='false';}
+// Temporarily opt in until email delivery is ready; do not mark accounts as verified.
+export function verificationRequired(){return process.env.REQUIRE_EMAIL_VERIFICATION==='true';}
